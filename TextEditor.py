@@ -1,21 +1,23 @@
 # -*- coding: utf-8 -*-
 from PyQt5.QtCore import pyqtSlot
 from PyQt5.QtWidgets import (QMainWindow, QApplication)
-from PyQt5.QtGui import (QTextCharFormat, QTextCursor, QColor, )
+from PyQt5.QtGui import (
+    QTextCharFormat,
+    QTextCursor,
+    QColor,
+)
 import sys
 from Ui_TextEditor import Ui_MainWindow
 from bloom_filter import BloomFilter
 
 
 class TextEditor(QMainWindow, Ui_MainWindow):
-
     class FontColor():
         keyword = '#AA0D91'
         type_ = '#000080'
         namespace_ = '008080'
         number = '#777777'
         String = '#CD853F'  # 秘鲁棕
-
         """
         Directive:643820
         keyword:AA0D91
@@ -59,7 +61,7 @@ class TextEditor(QMainWindow, Ui_MainWindow):
         self.formatChanged = True
         cursor = self.ui.textEdit.textCursor()
         cursor.setPosition(lo, QTextCursor.MoveAnchor)
-        cursor.setPosition(hi+1, QTextCursor.KeepAnchor)
+        cursor.setPosition(hi + 1, QTextCursor.KeepAnchor)
         colorFmt = cursor.charFormat()
         colorFmt.setForeground(color)
         cursor.mergeCharFormat(colorFmt)
@@ -84,7 +86,7 @@ class TextEditor(QMainWindow, Ui_MainWindow):
             hi = len(strList) - 1
         # 向后检查
         while True:
-            if hi >= len(strList)-1 or not strList[hi].isalnum():
+            if hi >= len(strList) - 1 or not strList[hi].isalnum():
                 if hi > 0 and not strList[hi].isalnum():
                     hi -= 1
                 break
@@ -102,9 +104,9 @@ class TextEditor(QMainWindow, Ui_MainWindow):
     def colorAndPaint(self, text, lo, hi):
         # 在这里设定颜色
         color = QColor()
-        if(self.keyword_filter.isInBits(text[lo:hi+1])):
+        if (self.keyword_filter.isInBits(text[lo:hi + 1])):
             color.setNamedColor(self.color.keyword)
-        elif(self.type_filter.isInBits(text[lo:hi+1])):
+        elif (self.type_filter.isInBits(text[lo:hi + 1])):
             color.setNamedColor(self.color.type_)
         # TODO:number
         # TODO:string
