@@ -19,14 +19,14 @@ class BloomFilter():
         __hashNum：int类型，表示hash函数的个数。
         __bits：位数组，用于记录某字符串是否在其中。
     """
-    __hashNum = 7
+    __hash_num = 7
     __bits = []
-    __bitSize = 480
+    __bit_size = 480
 
-    def __init__(self, hashNum=7, bitSize=480):
-        self.__hashNum = hashNum
+    def __init__(self, hash_num=7, bitSize=480):
+        self.__hash_num = hash_num
         self.__bits = np.zeros(bitSize, dtype=bool)
-        self.__bitSize = bitSize
+        self.__bit_size = bitSize
 
     def input(self, strList):
         """
@@ -37,10 +37,10 @@ class BloomFilter():
         """
         for s in strList:
             for i in range(1, 8):
-                inx = mmh3.hash(s, 2 ^ i) % self.__bitSize
+                inx = mmh3.hash(s, 2 ^ i) % self.__bit_size
                 self.__bits[inx] = True
 
-    def isInBits(self, s):
+    def is_in_bits(self, s):
         """
         函数说明：
         判断字符串是否在数据中。
@@ -48,7 +48,7 @@ class BloomFilter():
             s：字符串
         """
         for i in range(1, 8):
-            inx = mmh3.hash(s, 2 ^ i) % self.__bitSize
+            inx = mmh3.hash(s, 2 ^ i) % self.__bit_size
             if ~self.__bits[inx]:
                 return False
         return True
