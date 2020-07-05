@@ -9,7 +9,6 @@ from PyQt5.QtGui import (
 import sys
 from Ui_text_editor import Ui_MainWindow
 from bloom_filter import BloomFilter
-from font_config import FontColor
 from file_status import FileStatus
 from highlighter import Highlighter
 
@@ -17,8 +16,6 @@ class TextEditor(QMainWindow, Ui_MainWindow):
 
     def __init__(self):
         super().__init__()
-
-        # Attribution
         self.ui = Ui_MainWindow()
         self.init_UI()  # 界面绘制交给InitUi方法
         self.file_status = FileStatus()
@@ -26,17 +23,14 @@ class TextEditor(QMainWindow, Ui_MainWindow):
 
     def init_UI(self):
         self.ui.setupUi(self)
-        self.ui.textEdit.setFontPointSize(16)
+        self.ui.textEdit.setFontPointSize(12)
         self.ui.textEdit.setStyleSheet("background-color:#F5F5F5")
         self.ui.textBrowser.setStyleSheet("background-color:#F5F5F5")
         self.setWindowTitle('未命名')
         self.show()
 
-    # 槽函数
     @pyqtSlot()
     def on_textEdit_textChanged(self):
-        # 若有发生更改，更改后光标必定是在被更改处的前面，anchor数值为最后一次输入在文档的下标+1。
-        # 所以只需要对每次文本更改后位置到前面遇见空白符为止的字符串进行检验，若前后无符号，则可直接拿去检验；若后面有左括号：[({，则将括号删去。
         if self.highlighter.flag_format_changed:
             self.highlighter.flag_format_changed = False
             return
@@ -51,6 +45,7 @@ class TextEditor(QMainWindow, Ui_MainWindow):
         # set font
         if self.file_status.is_openFile:
             self.highlighter.mode_openfile()
+            self.file_status.is_openFile = False
         else:
             self.highlighter.mode_normal()
 
@@ -60,7 +55,7 @@ class TextEditor(QMainWindow, Ui_MainWindow):
         filename = QFileDialog.getOpenFileName(self, caption='Open File', directory='./', filter="c files(*.c);; cpp files(*.cpp)")
         if filename[0] == '':
             return
-        with open(filename[0], 'r') as f:
+        with open(filename[0], 'r', encoding='UTF-8') as f:
             content = ''
             for li in f.readlines():
                 content += li
@@ -77,7 +72,7 @@ class TextEditor(QMainWindow, Ui_MainWindow):
         filename = QFileDialog.getSaveFileName(self, caption='Open File', directory='./', filter="c files(*.c);; cpp files(*.cpp)")
         if filename[0] == '':
             return
-        with open(filename[0], 'w') as f:
+        with open(filename[0], 'w', encoding='UTF-8') as f:
             f.write(self.ui.textEdit.document().toPlainText())
         self.setWindowTitle(self.file_status.filename)
         self.file_status.set_saveStatus()
@@ -88,7 +83,7 @@ class TextEditor(QMainWindow, Ui_MainWindow):
         if self.file_status.is_untitle:
             self.on_act_saveAs_triggered()
         else:
-            with open(self.file_status.filedir, 'w') as f:
+            with open(self.file_status.filedir, 'w', encoding='UTF-8') as f:
                 f.write(self.ui.textEdit.document().toPlainText())
                 # windows title
                 self.setWindowTitle(self.file_status.filename)
@@ -100,6 +95,26 @@ class TextEditor(QMainWindow, Ui_MainWindow):
         self.ui.textEdit.setText('')
         self.setWindowTitle('未命名')
         self.file_status.__init__()
+
+    @pyqtSlot()
+    # 剪切
+    def on_act_undo_triggered(self):
+        self.ui.textEdit.undo()
+
+    @pyqtSlot()
+    # 剪切
+    def on_act_cut_triggered(self):
+        self.ui.textEdit.cut()
+
+    @pyqtSlot()
+    # 复制
+    def on_act_copy_triggered(self):
+        self.ui.textEdit.copy()
+
+    @pyqtSlot()
+    # 粘贴
+    def on_act_paste_triggered(self):
+        self.ui.textEdit.paste()
 
 
 if __name__ == '__main__':

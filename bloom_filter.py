@@ -5,7 +5,7 @@ import numpy as np
 """
 思路：
 1. 将字符串生成的int数据对bitNum取余，得到的便是下标，将bits[inx]设为1。
-2. 重复一过程7次，其中将mmh3的seed设置为2^i。
+2. 重复一过程N次，其中将mmh3的seed设置为2^i。
 示例
 f = BloomFilter()
 f.input(['123', '321', '132'])
@@ -36,7 +36,7 @@ class BloomFilter():
             strList:字符串列表，表示要加进来的字符串。
         """
         for s in strList:
-            for i in range(1, 8):
+            for i in range(1, self.__hash_num):
                 inx = mmh3.hash(s, 2 ^ i) % self.__bit_size
                 self.__bits[inx] = True
 
@@ -47,8 +47,20 @@ class BloomFilter():
         param：
             s：字符串
         """
-        for i in range(1, 8):
+        s = str(s)
+        for i in range(1, self.__hash_num):
             inx = mmh3.hash(s, 2 ^ i) % self.__bit_size
-            if ~self.__bits[inx]:
+            if not self.__bits[inx]:
                 return False
         return True
+
+
+if __name__ == "__main__":
+    bf = BloomFilter()
+    list_type = ['int', 'double', 'char']
+    bf.input(list_type)
+    print('检查已经输入到BloomFilter中的元素：')
+    for t in list_type:
+        print(bf.is_in_bits(t))
+    print('检查未输入到BloomFilter中的元素：')
+    print(bf.is_in_bits('123456'))
